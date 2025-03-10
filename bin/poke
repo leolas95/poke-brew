@@ -1,0 +1,141 @@
+#!/usr/bin/env ruby
+
+require 'net/http'
+require 'uri'
+require 'json'
+
+class Poke
+  VERSION = "0.4"
+  API_URL = "https://pokeapi.co/api/v2/pokemon"
+
+  def initialize(args)
+    @args = args
+  end
+
+  def run
+    if @args.empty?
+      show_help
+      return
+    end
+
+    command = @args[0]
+    case command
+    when "api"
+        if @args[1].nil?
+            puts "Error: Pokemon name is required"
+            return
+        end
+        fetch_api_data
+    when "version"
+      puts "Poke version #{VERSION}"
+    when "help"
+      show_help
+    else
+      puts "Unknown command: #{command}"
+      show_help
+    end
+  end
+
+  def fetch_api_data
+    # Example API endpoint - replace with your actual API URL
+    pokemon = @args[1]
+    api_url = API_URL + "/#{pokemon}"
+    options = []
+    if @args.length >= 2
+        options = @args[2..]
+    end
+    
+    begin
+      # Parse the URL
+      uri = URI.parse(api_url)
+      
+      # Create HTTP client
+      http = Net::HTTP.new(uri.host, uri.port)
+      http.use_ssl = (uri.scheme == 'https')
+      
+      # Create HTTP request
+      request = Net::HTTP::Get.new(uri.request_uri)
+      
+      # Send request and get response
+      response = http.request(request)
+      
+      # Check if request was successful
+      if response.code.to_i == 200
+        # Parse JSON response
+        @data = JSON.parse(response.body)
+
+        if !options.empty?
+            case options[0]
+            when "name"
+                show_name
+            when "types"
+                show_types
+            when "abilities"
+                show_abilities
+            when "stats"
+                show_stats
+            else
+                puts "Error: #{options[0]} not recognized"
+            end
+            return
+        end
+        show_all
+        
+      elsif response.code.to_i == 404
+        puts "Error: Pokemon #{pokemon} not found"
+      else
+        puts "Error: API request failed with status code #{response.code}"
+        puts response.body
+      end
+    rescue URI::InvalidURIError
+      puts "Error: Invalid URL format"
+    rescue JSON::ParserError
+      puts "Error: Failed to parse JSON response"
+    rescue => e
+      puts "Error: #{e.message}"
+    end
+  end
+
+  def show_all
+    show_name
+    show_types
+    show_abilities
+    show_stats
+  end
+
+  def show_name
+    puts "Name: #{@data['name']}"
+  end
+
+  def show_types
+    puts "Types: #{@data['types'].map { |type| type['type']['name'] }.join(', ')}"
+  end
+
+  def show_abilities
+    puts "Abilities:"
+    @data['abilities'].each do |ability|
+        puts "  > #{ability['ability']['name']}"
+    end
+  end
+
+  def show_stats
+    puts "Base stats:"
+    @data['stats'].each do |stat|
+        stat_name = stat['stat']['name']
+        base_value = stat['base_stat']
+        s = "#{stat_name}: #{base_value}"
+        printf("  > %-18s %d\n", stat_name, base_value)
+    end
+  end
+
+  def show_help
+    puts "Usage: poke [command] [options]"
+    puts "Commands:"
+    puts "  api [pokemon] [name | types | abilities | stats] - Fetch API data for a specific pokemon"
+    puts "  version       - Show version"
+    puts "  help          - Show this help message"
+  end
+end
+
+# Run the tool
+Poke.new(ARGV).run
