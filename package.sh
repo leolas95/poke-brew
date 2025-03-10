@@ -2,15 +2,16 @@
 
 # Script to package and update the poke CLI tool formula
 
-VERSION="0.6"
+VERSION="0.7"
 PACKAGE_NAME="v${VERSION}.tar.gz"
-USERNAME="leolas95"
+USERNAME="leonardo"
+GITHUB_USERNAME="leolas95"
 REPO_NAME="poke-brew"
 TAP_NAME="poke"
 TAP_DIR="$(brew --prefix)/Library/Taps/${USERNAME}/homebrew-${TAP_NAME}"
 
 # GitHub release URL
-GITHUB_URL="https://github.com/${USERNAME}/${REPO_NAME}/archive/refs/tags/${PACKAGE_NAME}"
+GITHUB_URL="https://github.com/${GITHUB_USERNAME}/${REPO_NAME}/archive/refs/tags/${PACKAGE_NAME}"
 
 echo "Downloading tarball from GitHub..."
 curl -L -o "${PACKAGE_NAME}" "${GITHUB_URL}"
@@ -24,7 +25,7 @@ echo "Updating formula with new hash..."
 cat > Formula/poke.rb << EOF
 class Poke < Formula
   desc "A simple CLI tool"
-  homepage "https://github.com/${USERNAME}/${REPO_NAME}"
+  homepage "https://github.com/${GITHUB_USERNAME}/${REPO_NAME}"
   url "${GITHUB_URL}"
   sha256 "${HASH}"
   
