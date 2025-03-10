@@ -1,16 +1,14 @@
 class Poke < Formula
-  desc "A simple CLI poke tool"
-  homepage ""
-  version "0.4"
-  
-  url "file://#{ENV['HOME']}/poke/poke-0.4.tar.gz"
-  sha256 "e84ac1833e2a033fa086d9246bfa48a915a834a4c438547a3a5bf343677e5905"
+  desc "A simple CLI tool"
+  homepage "https://github.com/leonardo/poke-brew"
+  url "https://github.com/leonardo/poke-brew/archive/refs/tags/v0.5.tar.gz"
+  sha256 "0019dfc4b32d63c1392aa264aed2253c1e0c2fb09216f8e2cc269bbfb8bb49b5"
   
   def install
-    bin.install "poke"
+    bin.install "bin/poke"
   end
   
   test do
-    system "poke", "version"
+    system "#{bin}/poke", "version"
   end
 end
