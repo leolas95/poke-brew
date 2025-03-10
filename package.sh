@@ -2,7 +2,7 @@
 
 # Script to package and install the poke CLI tool
 
-VERSION="0.4"
+VERSION="0.5"
 PACKAGE_NAME="poke-${VERSION}.tar.gz"
 USERNAME="leonardo"
 TAP_NAME="poke"
